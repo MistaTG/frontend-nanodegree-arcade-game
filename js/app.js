@@ -4,11 +4,23 @@ var Enemy = function(x ,y, speed) {
     // we've provided one for you to get started
     this.x = x;
     this.y = y;
+    // TODO make the speed random
     this.speed = speed;
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
+};
+
+Enemy.prototype.checkCollisions = function(player) {
+// Check if a player is colliding with any side of the enemy
+    if (player.x < this.x + 75 &&
+        player.x + 65 > this.x &&
+        player.y < this.y + 50 &&
+        player.y + 70 > this.y) { // TODO make a reset method
+        player.x = 200;
+        player.y = 375;
+    };
 };
 
 // Update the enemy's position, required method for game
@@ -19,10 +31,14 @@ Enemy.prototype.update = function(dt, speed) {
     // all computers.
     this.x += this.speed * dt;
 
+    // Re-Map the enemys back to loop around again
     if (this.x > 505) {
         this.x = -100;
     };
+
+    this.checkCollisions(player);
 };
+
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
@@ -40,7 +56,8 @@ var Player = function (x ,y) {
 };
 
 Player.prototype.update = function() {
-        if (this.x < 0) {
+// Make the player move and the area to reset it to
+    if (this.x < 0) {
         this.x = 0;
     } else if (this.x > 400) {
         this.x = 400;
@@ -54,7 +71,7 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.handleInput = function(allowedKeys) {
-
+// Calibrate how far the player moves with each keypress
  switch (allowedKeys) {
         case 'left': 
             this.x = this.x - 100;
