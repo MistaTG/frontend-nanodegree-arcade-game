@@ -9,7 +9,7 @@ var Entity = function(x, y, speed, sprite) {
 // Draw the entity on the screen
 Entity.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
+};
 
 // Check for any Entities coliding with a player will only be called in Enemy subclass
 Entity.prototype.checkCollisions = function(player) {
@@ -17,21 +17,20 @@ Entity.prototype.checkCollisions = function(player) {
         player.x + 70 > this.x &&
         player.y < this.y + 50 &&
         player.y + 70 > this.y) 
-        { 							// TODO make a reset method
-	    	// player.x = startPos[0];
-	    	// player.y = startPos[1];
+        {
+        	// Call the player Reset function when a collision happens
 	    	Player.prototype.playerReset(player);
-	    	//console.log(Player.prototype.PlayerReset());
-    };
+        };
 };
 
 // Create the player subclass from Entity TODO change the sprite location
 var Player = function(x, y, speed, sprite) {
 	Entity.call(this, x, y, speed);
-	var lives = 5;
-	var deaths = 0;
+	var lives, pScore;
+	this.lives = 5;
+	this.pScore = 0;
 	this.sprite = "images/char-boy.png";
-
+	this.otherSprite = "images/Star.png";
 };
 
 // Make a connection to the Entity.prototype object but set the constructor to Player
@@ -41,7 +40,7 @@ Player.prototype.constructor = Player;
 // Calibrate how far the player moves with each keypress
 Player.prototype.handleInput = function(allowedKeys) {
 	switch (allowedKeys) {
-        case 'left': 
+        case 'left':
             this.x = this.x - 100;
             break;
         case 'down':
@@ -64,23 +63,45 @@ Player.prototype.update = function() {
         this.x = 400;
     } else if (this.y === 0) {
         this.y = 375;
+        this.pScore++;
+        ctx.clearRect(0,0,505,100);
+        //ctx.drawImage(Resources.get(this.otherSprite), 100, 400);
+  //       for (var i = 1; i < 5; i++) {
+	 //    	if (this.y === 0) {
+	 //    		ctx.drawImage(Resources.get(this.otherSprite), 10, 400);
+	 //    	}
+		// }
     } else if (this.y < 0) {
         this.y = 0;
     } else if (this.y > 375) {
         this.y = 375;
     };
+    
+    this.score();
 };
 
 // Create a variable that stores the starting player position
 Player.prototype.startPos = [200, 375];
 var startPos = Player.prototype.startPos;
 
+// Call this when the player collides with an enemy 
+// set it back to the starting position
+// and decrement/increment the players lives/deaths
 Player.prototype.playerReset = function(player) {
 	player.x = startPos[0];
 	player.y = startPos[1];
 
-	this.lives--;
-	this.deaths++;
+	player.lives--;
+	//player.pScore++;
+	ctx.clearRect(0,0,505,100);
+	//console.log(lives);
+};
+
+// Paint the canvas with a Lives and Score counter
+Player.prototype.score = function() {
+	ctx.font = "30pt Arial";
+	ctx.fillText("Lives : " + this.lives, 10,45);
+	ctx.fillText("Score : " + this.pScore, 300,45);
 };
 
 // Create the Enemy subclass from Entity TODO change the sprite location
@@ -103,6 +124,7 @@ Enemy.prototype.update = function(dt, speed) {
 		this.x = -100;
 	};
 
+	// Check the if an enemy collides with a player
 	this.checkCollisions(player);
 };
 
