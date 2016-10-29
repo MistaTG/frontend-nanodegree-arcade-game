@@ -12,14 +12,13 @@ var Enemy = function(x ,y, speed) {
     this.sprite = 'images/enemy-bug.png';
 };
 
-Enemy.prototype.checkCollisions = function(player) {
+Enemy.prototype.checkCollisions = function(player, startPos) {
 // Check if a player is colliding with any side of the enemy
-    if (player.x < this.x + 75 &&
-        player.x + 65 > this.x &&
+    if (player.x < this.x + 65 &&
+        player.x + 70 > this.x &&
         player.y < this.y + 50 &&
         player.y + 70 > this.y) { // TODO make a reset method
-        player.x = 200;
-        player.y = 375;
+        Player.prototype.reset(startingPos);
     };
 };
 
@@ -36,7 +35,7 @@ Enemy.prototype.update = function(dt, speed) {
         this.x = -100;
     };
 
-    this.checkCollisions(player);
+    this.checkCollisions(player, startingPos);
 };
 
 
@@ -92,14 +91,28 @@ Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now instantiate your objects.
+Player.prototype.reset = function(resetLoc) {
+    //player = player;
+    resetLoc = resetLoc;
+    resetLoc[0];
+    resetLoc[1];
+};
+
+// set the starting position here
+Player.prototype.startingPos = [ 
+    x = 200,
+    y = 375];
+
+
+console.log(startingPos);
+// Now inst antiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var allEnemies = [ 
         newEnemy = new Enemy(1, 225, 300), 
         anotherEnemy = new Enemy(1, 135, 200),
         nextEnemy = new Enemy(1, 50, 400)];
-var player = new Player(200, 375);
+var player = new Player(startingPos[0], startingPos[1]);
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
