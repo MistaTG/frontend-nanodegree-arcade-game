@@ -65,12 +65,6 @@ Player.prototype.update = function() {
         this.y = 375;
         this.pScore++;
         ctx.clearRect(0,0,505,100);
-        //ctx.drawImage(Resources.get(this.otherSprite), 100, 400);
-  //       for (var i = 1; i < 5; i++) {
-	 //    	if (this.y === 0) {
-	 //    		ctx.drawImage(Resources.get(this.otherSprite), 10, 400);
-	 //    	}
-		// }
     } else if (this.y < 0) {
         this.y = 0;
     } else if (this.y > 375) {
@@ -92,9 +86,7 @@ Player.prototype.playerReset = function(player) {
 	player.y = startPos[1];
 
 	player.lives--;
-	//player.pScore++;
 	ctx.clearRect(0,0,505,100);
-	//console.log(lives);
 };
 
 // Paint the canvas with a Lives and Score counter
@@ -117,6 +109,7 @@ Enemy.prototype.constructor = Enemy;
 // Move the enemys
 Enemy.prototype.update = function(dt, speed) {
 	// Change its x location to it plus the speed and multiplied by the time delta
+    // TODO make the enemys speed more random
 	this.x += this.speed * dt;
 
 	// Wrap the enemy back onto the screen after it reaches the end

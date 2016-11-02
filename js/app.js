@@ -1,78 +1,46 @@
-// Enemies our player must avoid
-var Enemy = function(x ,y, speed) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+// Generic Entity Superclass
+var Entity = function(x, y, speed, sprite) {
     this.x = x;
     this.y = y;
-    // TODO make the speed random
     this.speed = speed;
-
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
+    this.sprite = sprite;
 };
 
-Enemy.prototype.checkCollisions = function(player, startPos) {
-// Check if a player is colliding with any side of the enemy
-    if (player.x < this.x + 65 &&
-        player.x + 70 > this.x &&
-        player.y < this.y + 50 &&
-        player.y + 70 > this.y) { // TODO make a reset method
-        Player.prototype.reset(startingPos);
-    };
-};
-
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt, speed) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-    this.x += this.speed * dt;
-
-    // Re-Map the enemys back to loop around again
-    if (this.x > 505) {
-        this.x = -100;
-    };
-
-    this.checkCollisions(player, startingPos);
-};
-
-
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
+// Draw the entity on the screen
+Entity.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-var Player = function (x ,y) {
-    this.x = x;
-    this.y = y;
-    this.speed = 2;
+// Check for any Entities coliding with a player will only be called in Enemy subclass
+Entity.prototype.checkCollisions = function(player) {
+    if (player.x < this.x + 65 &&
+        player.x + 70 > this.x &&
+        player.y < this.y + 50 &&
+        player.y + 70 > this.y) 
+        {
+            // Call the player Reset function when a collision happens
+            Player.prototype.playerReset(player);
+        };
+};
+
+// Create the player subclass from Entity TODO change the sprite location
+var Player = function(x, y, speed, sprite) {
+    Entity.call(this, x, y, speed);
+    var lives, pScore;
+    this.lives = 5;
+    this.pScore = 0;
     this.sprite = "images/char-boy.png";
+    this.otherSprite = "images/Star.png";
 };
 
-Player.prototype.update = function() {
-// Make the player move and the area to reset it to
-    if (this.x < 0) {
-        this.x = 0;
-    } else if (this.x > 400) {
-        this.x = 400;
-    } else if (this.y === 0) {
-        this.y = 375;
-    } else if (this.y < 0) {
-        this.y = 0;
-    } else if (this.y > 375) {
-        this.y = 375;
-    };
-};
+// Make a connection to the Entity.prototype object but set the constructor to Player
+Player.prototype = Object.create(Entity.prototype);
+Player.prototype.constructor = Player;
 
-Player.prototype.handleInput = function(allowedKeys) {
 // Calibrate how far the player moves with each keypress
- switch (allowedKeys) {
-        case 'left': 
+Player.prototype.handleInput = function(allowedKeys) {
+    switch (allowedKeys) {
+        case 'left':
             this.x = this.x - 100;
             break;
         case 'down':
@@ -87,32 +55,78 @@ Player.prototype.handleInput = function(allowedKeys) {
     };
 };
 
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+// Set limits to where the player can move to
+Player.prototype.update = function() {
+    if (this.x < 0) {
+        this.x = 0;
+    } else if (this.x > 400) {
+        this.x = 400;
+    } else if (this.y === 0) {
+        this.y = 375;
+        this.pScore++;
+        ctx.clearRect(0,0,505,100);
+    } else if (this.y < 0) {
+        this.y = 0;
+    } else if (this.y > 375) {
+        this.y = 375;
+    };
+    
+    this.score();
 };
 
-Player.prototype.reset = function(resetLoc) {
-    //player = player;
-    resetLoc = resetLoc;
-    resetLoc[0];
-    resetLoc[1];
+// Create a variable that stores the starting player position
+Player.prototype.startPos = [200, 375];
+var startPos = Player.prototype.startPos;
+
+// Call this when the player collides with an enemy 
+// set it back to the starting position
+// and decrement/increment the players lives/deaths
+Player.prototype.playerReset = function(player) {
+    player.x = startPos[0];
+    player.y = startPos[1];
+
+    player.lives--;
+    ctx.clearRect(0,0,505,100);
 };
 
-// set the starting position here
-Player.prototype.startingPos = [ 
-    x = 200,
-    y = 375];
+// Paint the canvas with a Lives and Score counter
+Player.prototype.score = function() {
+    ctx.font = "30pt Arial";
+    ctx.fillText("Lives : " + this.lives, 10,45);
+    ctx.fillText("Score : " + this.pScore, 300,45);
+};
 
+// Create the Enemy subclass from Entity TODO change the sprite location
+var Enemy = function(x, y, speed, sprite) {
+    Entity.call(this, x, y, speed);
+    this.sprite = 'images/enemy-bug.png';
+};
 
-console.log(startingPos);
-// Now inst antiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
+// Make a connection to the Entity.prototype object and set the constructor to Enemy
+Enemy.prototype = Object.create(Entity.prototype);
+Enemy.prototype.constructor = Enemy;
+
+// Move the enemys
+Enemy.prototype.update = function(dt, speed) {
+    // Change its x location to it plus the speed and multiplied by the time delta
+    // TODO make the enemys speed more random
+    this.x += this.speed * dt;
+
+    // Wrap the enemy back onto the screen after it reaches the end
+    if (this.x > 505) {
+        this.x = -100;
+    };
+
+    // Check the if an enemy collides with a player
+    this.checkCollisions(player);
+};
+
+// Initialize the Enemys and Players
 var allEnemies = [ 
         newEnemy = new Enemy(1, 225, 300), 
         anotherEnemy = new Enemy(1, 135, 200),
         nextEnemy = new Enemy(1, 50, 400)];
-var player = new Player(startingPos[0], startingPos[1]);
+var player = new Player(startPos[0], startPos[1], 2);
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
