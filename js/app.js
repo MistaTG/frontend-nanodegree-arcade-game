@@ -1,3 +1,5 @@
+"use strict";
+
 // Generic Entity Superclass
 var Entity = function(x, y, speed, sprite) {
     this.x = x;
@@ -122,6 +124,8 @@ Enemy.prototype.update = function(dt, speed) {
 };
 
 // Initialize the Enemys and Players
+var newEnemy, anotherEnemy, nextEnemy;
+
 var allEnemies = [ 
         newEnemy = new Enemy(1, 225, 300), 
         anotherEnemy = new Enemy(1, 135, 200),
